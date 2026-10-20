@@ -1,0 +1,4 @@
+<!doctype html><html lang="en" xmlns:th="http://www.thymeleaf.org"><body>
+<header th:fragment="nav" class="nav"><a class="brand" href="/" aria-label="DIYANATH Medicare home"><span class="brand-icon" aria-hidden="true">+</span><span class="brand-words">DIYANATH <span>Medicare</span><small>Better Health · Brighter Tomorrow</small></span></a><nav aria-label="Main navigation"><a class="nav-home" href="/">Home</a><a href="/#doctors">Doctors</a><a href="/login">Appointments</a><a href="/dashboard">Dashboard</a><a class="nav-login" href="/login">Login</a><a class="nav-cta" href="/register">Register</a></nav></header>
+<div th:fragment="alerts"><div class="alert success" role="status" th:if="${success}" th:text="${success}"></div><div class="alert error" role="alert" th:if="${error}" th:text="${error}"></div></div>
+</body></html>

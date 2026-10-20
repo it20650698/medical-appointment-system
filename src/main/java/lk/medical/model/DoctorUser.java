@@ -1,0 +1,2 @@
+package lk.medical.model;
+public class DoctorUser extends User { private String specialization=""; public DoctorUser(){} public DoctorUser(String id,String name,String email,String password,String phone,String address,String specialization){super(id,name,email,password,phone,address,"DOCTOR");this.specialization=specialization;} @Override public boolean authenticate(String p){return getPassword()!=null&&getPassword().equals(p);} public String getSpecialization(){return specialization;} public void setSpecialization(String v){specialization=v;} }

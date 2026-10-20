@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Administration | DIYANATH Medicare</title><link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div th:replace="~{fragments :: nav}"></div>
+<main class="dashboard admin-dashboard">
+  <div th:replace="~{fragments :: alerts}"></div>
+  <div class="dashboard-heading"><div><div class="eyebrow">ADMINISTRATION</div><h1>System <span>management</span></h1><p class="muted">Maintain the care team, patient directory and appointment schedule.</p></div><a class="button outline-button" href="/logout">Sign out</a></div>
+  <div class="stats-grid">
+    <div class="stat-card"><span>Registered doctors</span><strong th:text="${#lists.size(doctors)}">0</strong><small>In the directory</small></div>
+    <div class="stat-card"><span>Patients</span><strong th:text="${#lists.size(patients)}">0</strong><small>Registered accounts</small></div>
+    <div class="stat-card"><span>Appointments</span><strong th:text="${#lists.size(appointments)}">0</strong><small>All recorded visits</small></div>
+  </div>
+  <section class="panel" id="doctor-editor">
+    <div class="panel-title"><div><div class="eyebrow">DOCTOR DIRECTORY</div><h2 id="doctor-form-title">Add a doctor</h2><p class="muted form-hint">Enter the doctor's details. Use Edit in the directory to update an existing profile.</p></div></div>
+    <form class="booking-form doctor-editor-form" method="post" action="/admin/doctor/save" id="doctor-form">
+      <input type="hidden" name="id" id="doctor-id" value="">
+      <label>Doctor name<input name="name" id="doctor-name" required maxlength="100" placeholder="Dr. Full Name"></label>
+      <label>Specialization<input name="specialization" id="doctor-specialization" required maxlength="80" placeholder="e.g. Cardiology"></label>
+      <label>Availability<input name="availability" id="doctor-availability" required maxlength="120" placeholder="Mon-Fri 09:00-13:00"></label>
+      <label>Room number<input name="room" id="doctor-room" required maxlength="20" placeholder="e.g. 204"></label>
+      <label>Consultation fee (LKR)<input name="fee" id="doctor-fee" type="number" min="0" step="0.01" required placeholder="2500"></label>
+      <label>Doctor category<select name="type" id="doctor-type"><option value="GP">General Practitioner</option><option value="SPECIALIST">Specialist Doctor</option></select></label>
+      <label>Login email<input name="email" id="doctor-email" type="email" required maxlength="120" placeholder="doctor@clinic.lk"></label>
+      <label>Password<input name="password" id="doctor-password" type="password" minlength="6" required value="doctor123" autocomplete="new-password"></label>
+      <div class="form-actions"><button class="button primary-button" id="doctor-submit" type="submit">Add doctor</button><button class="button outline-button" id="doctor-reset" type="button">Clear form</button></div>
+    </form>
+  </section>
+  <section class="panel">
+    <div class="panel-title"><div><div class="eyebrow">CARE TEAM</div><h2>Manage doctors</h2><p class="muted form-hint">Create, view, update or remove doctor profiles.</p></div></div>
+    <div class="table-wrap"><table><thead><tr><th>Doctor</th><th>Specialization</th><th>Availability</th><th>Room</th><th>Fee (LKR)</th><th>Account email</th><th>Actions</th></tr></thead>
+      <tbody><tr th:each="d : ${doctors}">
+        <td><strong th:text="${d.name}">Doctor</strong><small class="table-subtext" th:text="${d.type == 'SPECIALIST' ? 'Specialist' : 'General practitioner'}">Type</small></td>
+        <td th:text="${d.specialization}">Specialization</td><td th:text="${d.availability}">Availability</td><td th:text="${d.roomNumber}">101</td><td th:text="${#numbers.formatDecimal(d.fee,1,2)}">0.00</td><td th:text="${d.email}">Email</td>
+        <td><div class="actions action-stack">
+          <button class="mini-button edit-doctor" type="button" th:attr="data-id=${d.id},data-name=${d.name},data-specialization=${d.specialization},data-availability=${d.availability},data-room=${d.roomNumber},data-fee=${d.fee},data-type=${d.type},data-email=${d.email}">Edit</button>
+          <form method="post" action="/admin/doctor/delete" onsubmit="return confirm('Remove this doctor from the directory?')"><input type="hidden" name="id" th:value="${d.id}"><button class="mini-button danger" type="submit">Delete</button></form>
+        </div></td>
+      </tr><tr th:if="${#lists.isEmpty(doctors)}"><td colspan="7" class="empty-cell">No doctors are registered yet. Use the form above to add the first doctor.</td></tr></tbody>
+    </table></div>
+  </section>
+  <section class="panel">
+    <div class="panel-title"><div><div class="eyebrow">PATIENT DIRECTORY</div><h2>Manage patients</h2></div></div>
+    <div class="table-wrap"><table><thead><tr><th>Patient</th><th>Email</th><th>Phone</th><th>Address</th><th>Action</th></tr></thead><tbody>
+      <tr th:each="p : ${patients}"><td th:text="${p.fullName}">Name</td><td th:text="${p.email}">Email</td><td th:text="${p.phone}">Phone</td><td th:text="${p.address}">Address</td><td><form method="post" action="/admin/patient/delete" onsubmit="return confirm('Remove this patient and their appointments?')"><input type="hidden" name="id" th:value="${p.id}"><button class="mini-button danger" type="submit">Delete patient</button></form></td></tr>
+      <tr th:if="${#lists.isEmpty(patients)}"><td colspan="5" class="empty-cell">No patient accounts found.</td></tr>
+    </tbody></table></div>
+  </section>
+  <section class="panel">
+    <div class="panel-title"><div><div class="eyebrow">SCHEDULE OVERVIEW</div><h2>All appointments</h2></div></div>
+    <div class="table-wrap"><table><thead><tr><th>Date and time</th><th>Patient</th><th>Doctor</th><th>Status</th><th>Update status</th></tr></thead><tbody>
+      <tr th:each="a : ${appointments}"><td th:text="${a.date + ' ' + a.time}">Date</td><td th:text="${@medicalService.patientName(a.patientId)}">Patient</td><td th:text="${@medicalService.doctorName(a.doctorId)}">Doctor</td><td><span class="status" th:classappend="${#strings.toLowerCase(a.status)}" th:text="${a.status}">Pending</span></td><td><form method="post" action="/appointments/action" class="inline-form"><input type="hidden" name="id" th:value="${a.id}"><select name="action" aria-label="Appointment status"><option value="PENDING" th:selected="${a.status == 'PENDING'}">Pending</option><option value="CONFIRMED" th:selected="${a.status == 'CONFIRMED'}">Confirmed</option><option value="COMPLETED" th:selected="${a.status == 'COMPLETED'}">Completed</option><option value="CANCELLED" th:selected="${a.status == 'CANCELLED'}">Cancelled</option></select><button class="mini-button" type="submit">Save</button></form></td></tr>
+      <tr th:if="${#lists.isEmpty(appointments)}"><td colspan="5" class="empty-cell">No appointments have been booked yet.</td></tr>
+    </tbody></table></div>
+  </section>
+</main>
+<footer><a class="brand" href="/">DIYANATH <span>Medicare</span></a><span>Medical Appointment Scheduling System</span><span>SE1020 · OOP Project</span></footer>
+<script>
+(function () {
+  const form = document.getElementById('doctor-form');
+  const title = document.getElementById('doctor-form-title');
+  const submit = document.getElementById('doctor-submit');
+  const fields = {id:'doctor-id',name:'doctor-name',specialization:'doctor-specialization',availability:'doctor-availability',room:'doctor-room',fee:'doctor-fee',type:'doctor-type',email:'doctor-email',password:'doctor-password'};
+  document.querySelectorAll('.edit-doctor').forEach(function (button) {
+    button.addEventListener('click', function () {
+      Object.keys(fields).forEach(function (key) {
+        document.getElementById(fields[key]).value = button.dataset[key] || '';
+      });
+      title.textContent = 'Update doctor profile';
+      submit.textContent = 'Save changes';
+      document.getElementById('doctor-password').required = false;
+      document.getElementById('doctor-password').placeholder = 'Leave blank to keep current password';
+      document.getElementById('doctor-editor').scrollIntoView({behavior:'smooth',block:'start'});
+      document.getElementById('doctor-name').focus({preventScroll:true});
+    });
+  });
+  document.getElementById('doctor-reset').addEventListener('click', function () {
+    form.reset();
+    document.getElementById('doctor-id').value = '';
+    document.getElementById('doctor-password').required = true;
+    document.getElementById('doctor-password').placeholder = '';
+    title.textContent = 'Add a doctor';
+    submit.textContent = 'Add doctor';
+  });
+})();
+</script>
+</body></html>

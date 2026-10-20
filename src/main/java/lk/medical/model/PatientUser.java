@@ -1,0 +1,2 @@
+package lk.medical.model;
+public class PatientUser extends User { private String medicalHistory=""; public PatientUser(){} public PatientUser(String id,String name,String email,String password,String phone,String address,String history){super(id,name,email,password,phone,address,"PATIENT");medicalHistory=history;} @Override public boolean authenticate(String p){return getPassword()!=null&&getPassword().equals(p);} public String getMedicalHistory(){return medicalHistory;} public void setMedicalHistory(String v){medicalHistory=v;} }
