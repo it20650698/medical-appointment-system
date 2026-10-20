@@ -1,5 +1,3 @@
-<div align="center">
-
 # Medical Appointment Scheduling System
 ### SE1020: Object-Oriented Programming — Final Coursework Project
 
@@ -9,58 +7,71 @@
 ![Maven](https://img.shields.io/badge/Apache_Maven-Build-C71A36?style=for-the-badge&logo=apachemaven&logoColor=white)
 ![Persistence](https://img.shields.io/badge/Storage-Flat--File%20IO-blue?style=for-the-badge&logo=files)
 
-<p align="center">
-  A clean, modular Java web application demonstrating core Object-Oriented Programming (OOP) paradigms with a custom flat-file persistence engine instead of an RDBMS.
-</p>
-
-[Key Features](#-key-features) •
-[OOP Architecture](#-object-oriented-programming-oop-pillars) •
-[Storage Schema](#-file-persistence-engine) •
-[Getting Started](#-getting-started) •
-[Author](#-author)
+A standalone Java Spring Boot web application designed for doctor discovery, appointment requests, and clinical visit record management. The application uses low-level flat-file persistence (`BufferedReader` / `BufferedWriter`) instead of a relational database, strictly applying core Object-Oriented Programming principles.
 
 ---
 
-</div>
+## Features
 
-## Project Overview
-
-The **Medical Appointment Scheduling System** is designed to streamline clinical appointment workflows, doctor discovery, and medical record management. Instead of relying on traditional SQL databases, the application implements a stream-based flat-file persistence layer using Java `BufferedReader` and `BufferedWriter`, testing low-level data serialization, delimiter integrity, and object mapping within a modern Spring Boot web architecture.
-
----
-
-## Key Features
-
-- **Multi-Role Portal:** Dedicated views and workflows for Patients, Clinicians, and System Administrators.
-- **Doctor Directory & Filtering:** Real-time doctor search filtered by clinical specialty.
-- **Slot Reservation Engine:** Overlap detection preventing double-booking of doctor shifts.
-- **Diagnostic Record Management:** Clinician consultation logs protected by URL-safe Base64 encoding.
-- **Responsive Web UI:** Clean, mobile-friendly interface built with modern CSS3 and Thymeleaf templates.
+- **Multi-Role Portal:** Separate dashboards for Patients, Doctors, and Administrators.
+- **Doctor Discovery:** Filter clinicians by medical specialty.
+- **Appointment Scheduling:** Slot booking with collision detection to prevent double-booking.
+- **Medical Records:** Clinician consultation logs protected by URL-safe Base64 encoding.
+- **Responsive UI:** Clean interface built using HTML5, CSS3, and server-side Thymeleaf templates.
 
 ---
 
-## Object-Oriented Programming (OOP) Pillars
+## OOP Implementation
 
-| Principle | Implementation Details in This System |
+| Principle | Implementation Details |
 |---|---|
-| **Encapsulation** | Strict `private` field visibility in models (`User`, `Patient`, `Doctor`, `Appointment`); mutation validated through public getters and setters. |
-| **Inheritance** | Base `User` class extended by `PatientUser`, `DoctorUser`, and `AdminUser`. Base `Doctor` extended into `GeneralPractitioner` and `SpecialistDoctor`. |
-| **Polymorphism** | Overridden `calculateConsultationFee()` dynamically evaluating rates at runtime based on doctor specialization category. |
-| **Abstraction** | Data layer decoupled using a generic `FileRepository<T, ID>` interface, separating business logic from direct file I/O streams. |
+| **Encapsulation** | Private fields across all model entities (`User`, `Patient`, `Doctor`, `Appointment`) with public accessors and mutator validation. |
+| **Inheritance** | `PatientUser`, `DoctorUser`, and `AdminUser` extend base `User`. `GeneralPractitioner` and `SpecialistDoctor` extend `Doctor`. |
+| **Polymorphism** | Overridden `calculateConsultationFee()` dynamically evaluating rates at runtime based on specialization tier. |
+| **Abstraction** | Generic `FileRepository<T, ID>` interface separating business services from file stream operations. |
 
 ---
 
-## File Persistence Engine
+## File Persistence Architecture
 
-All system records persist in structured text files located in the `data/` runtime directory:
+Data is stored in plain text files using pipe (`|`) delimiters:
 
-* `users.txt` — User credentials, roles, and account metadata.
-* `doctors.txt` — Medical council IDs, doctor specializations, and fee tiers.
-* `appointments.txt` — Time-slot reservations, clinician-patient links, and appointment states.
-* `medical-records.txt` — Clinical consultation notes and diagnostic summaries.
-
-### Record Delimiter Schema
+- `users.txt` — User credentials, roles, and profile information.
+- `doctors.txt` — Medical IDs, specialties, and fee structures.
+- `appointments.txt` — Scheduled appointments, timestamps, and status flags.
+- `medical-records.txt` — Consultation notes and medical histories.
 
 ```text
 Format : <Appointment_ID>|<Patient_ID>|<Doctor_ID>|<Base64_Payload>|<Status>|<Clinical_Reason>
 Example: APP-1024|PAT-501|DOC-202|MjAyNi0xMS0xNVQxMDozMDowMA==|CONFIRMED|General Checkup
+```
+
+---
+
+## How to Run
+
+1. **Clone the repository:**
+   ```bash
+   git clone [https://github.com/it20650698/medical-appointment-system.git](https://github.com/it20650698/medical-appointment-system.git)
+   cd medical-appointment-system
+   ```
+
+2. **Build and Run:**
+   ```bash
+   mvn spring-boot:run
+   ```
+
+3. **Access via browser:**
+   ```text
+   http://localhost:8081
+   ```
+
+---
+
+## Author
+
+- **Name:** Samaraweera S.M.R.
+- **Student ID:** IT20650698
+- **Institution:** Sri Lanka Institute of Information Technology (SLIIT)
+- **Degree:** B.Sc. (Hons) in Information Technology
+- **Module:** SE1020 — Object-Oriented Programming
