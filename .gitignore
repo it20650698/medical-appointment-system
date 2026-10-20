@@ -1,0 +1,6 @@
+target/
+.idea/
+*.iml
+.DS_Store
+# Keep local data out of commits when it contains real user information
+# data/
